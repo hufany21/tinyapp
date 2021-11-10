@@ -5,7 +5,8 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
 function generateRandomString() {
-
+  let ranId = (Math.random() + 1).toString(36).substring(7);
+  return ranId;
 }
 
 app.set("view engine", "ejs");
@@ -49,9 +50,13 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   // const longURL = ...
-  res.redirect(longURL);
+  res.redirect("/urls");
 });
-
+app.post("/urls/:shortURL/delete", (req, res) => {
+  shortURL = generateRandomString();
+  delete urlDatabase[req.params.shortURL]
+  res.redirect(`/urls/`)
+});
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
