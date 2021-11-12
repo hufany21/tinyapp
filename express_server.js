@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser')
 const PORT = 8000; // default port 8080
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session')
+const bcrypt = require('bcryptjs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser())
 app.set("view engine", "ejs");
@@ -18,12 +19,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID", 
     email: "user@example.com", 
-    password: "1234"
+    password: bcrypt.hashSync('1234', 10)
   },
  "user2RandomID": {
     id: "user2RandomID", 
     email: "user2@example.com", 
-    password: "dishwasher-funk"
+    password: bcrypt.hashSync("dishwasher-funk", 10)
   }
 }
 
@@ -43,7 +44,7 @@ function emailLookup(email){
 
 function passLookup(password, email){
   for (let key in users){
-    if(users[key].password === password && users[key].email === email) {
+    if(bcrypt.compareSync(password, users[key].password) && users[key].email === email) {
       return users[key].id
     }
   }
@@ -153,11 +154,15 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
   const email = req.body.email
-	const password = req.body.pass
+	let password = req.body.pass
   const id = generateRandomString()
  
    if (emailLookup(email)){
+     
+  password = bcrypt.hashSync(password, 10);
+
     users[id] = { id, email, password }
+    console.log(users[id])
     res.cookie("user_id", id)
     return res.redirect(`/urls`)
    } if (!email || !password) {
