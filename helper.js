@@ -1,28 +1,41 @@
-const users = { 
-  "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
-  },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
-    password: "dishwasher-funk"
-  }
+function generateRandomString() {
+  let ranId = (Math.random() + 1).toString(36).substring(7);
+  return ranId;
 }
-console.log(users.userRandomID.email)
-
 
 function emailLookup(email){
   for (let key in users){
     if(users[key].email === email){
-      return "400: User Already Exist in Database"
+      return false
     }
   }
   return true
 };
 
-console.log(emailLookup('user2@example.com'))
+function passLookup(password, email){
+  for (let key in users){
+    if(users[key].password === password && users[key].email === email) {
+      return users[key].id
+    }
+  }
+  return false
+};
 
+const urlsForUser = function (id){
+  const results = {};
+  const keys = Object.keys(urlDatabase);
+  for (const shortURL of keys) {
+    const url = urlDatabase[shortURL];
+  if (url.userID === id) {
+    results[shortURL]  = url.longURL
+  }
+ }
+ return results
+};
 
-
+module.exports = 
+  passLookup(),
+  urlsForUser(),
+  generateRandomString(),
+  emailLookup()
+;

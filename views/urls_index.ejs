@@ -8,9 +8,8 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <title>TinyApp</title>
 </head>
+<%- include('partials/_header', {user_id}) %>
 <body>
-  <%- include('partials/_header', {user_id}) %>
-
   <main style="margin: 1em;">
     <h3>My URLs</h3>
     <table class="table">
@@ -24,8 +23,10 @@
         </tr>
       </thead>
       <tbody>
-        <% for(let url in urls) { %>
+       
           <tr>
+            <% if(user_id) { %>
+              <% for(let url in urls) { %>
             <td><%= url %></td>
             <td><%= urls[url] %></td>
 
@@ -33,7 +34,12 @@
 
             <td><form method="POST" action="/urls/<%= url %>/delete"><input type="submit" style="background-color:white; border-color:red; color:red" value="Delete"></form></td>
           </tr>
-        <% } %>
+        <% }} else { %>
+          <h5>Please<a href="/login"> Login   </a> </h5>
+
+
+       <%  }  %>
+           
       </tbody>
     </table>
   </main>
