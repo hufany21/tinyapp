@@ -7,23 +7,22 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <% if(user_id){ %> <a class="nav-item nav-link" href="/urls/new">Create New URL  </a>    <% } else { %> <a class="nav-item nav-link" href="/login">Create New URL  </a>  <% } %>  
-        <a class="nav-item nav-link" href="/register">Register   </a>
-      </div>
-    </div>
+       
    
     <% if(user_id){ %>
+      <a class="nav-item nav-link" href="/urls/new">Create New URL  </a> 
       <form class="form-inline" action="/logout" method="POST">
       <div class="form-group mb-2">
         <label for="username">Logged In As: <%= user_id.email %> </label>
-        <button type="submit" class="btn btn-primary" href="/login">Logout</button>
+        <button type="submit" class="btn btn-primary" href="/logout">Logout</button>
       </div>
     </form>
 
-    <% } else { %>  
+    <% } else { %> 
+      <a class="nav-item nav-link" href="/login">Create New URL  </a>
+      <a class="nav-item nav-link" href="/register">Register   </a> 
         <form class="form-inline" action="/login" method="GET">
       <div class="form-group mb-2">
-        <label for="username"></label>
         <button type="submit" class="btn btn-primary" href="/login">Login</button>
       </div>
     </form>
