@@ -96,23 +96,32 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
+  if (!req.session["user_id"]) {
+    return res.redirect(`/login`);
+  }
   const templateVars = {  user_id: users[req.session.user_id]  };
   res.render("urls_new",templateVars);
 });
 
 app.post("/urls", (req, res) => {
+  if (!req.session.user_id) {     //not logged in
+    return res.status(400).send("Please login");
+  }
   let shortURL = generateRandomString();
-  urlDatabase[shortURL] = { longURL: req.body.longURL, user_id: req.session.user_id };
+  urlDatabase[shortURL] = { 
+    longURL: req.body.longURL, 
+    user_id: req.session.user_id 
+  };
   res.redirect(`/urls/${shortURL}`);
 });
 
 
 app.get("/urls/:shortURL", (req, res) => {
   if (!req.session.user_id) {     //not logged in
-    return res.send("Please login to see this information");
+    return res.status(401).send("Please login to see this information");
   }
   if (urlDatabase[req.params.shortURL].user_id !== req.session.user_id) {  ///wrong user_id
-    return res.send("You dont have permisson to view this url");
+    return res.status(401).send("You dont have permisson to view this url");
   }
   const templateVars = {  user_id: users[req.session.user_id], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };
   res.render("urls_show", templateVars);
@@ -124,11 +133,27 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
+  if (!req.session.user_id) {
+    return res.status(400).send("Register/Login to access page");
+
+  }
+  if (urlDatabase[req.params.shortURL].user_id !== req.session.user_id) {
+    res.status(400).send("Error, do not have access");
+    return;
+  }
+  
   delete urlDatabase[req.params.shortURL];
   res.redirect(`/urls/`);
 });
 
 app.post("/urls/:shortURL/", (req, res) => {
+  if (!req.session.user_id) {
+    return res.status(400).send("Register/Login to access page");
+  }
+  if (urlDatabase[req.params.shortURL].user_id !== req.session.user_id) {
+    res.status(400).send("Error, do not have access");
+    return;
+  }
   urlDatabase[req.params.shortURL].longURL = req.body.longURL;
   res.redirect(`/urls`);
 });
@@ -153,15 +178,16 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   let password = req.body.pass;
   const id = generateRandomString();
+  if (!email || !password) {   //if either are not there, display error
+    return res.status(400).send("400: Email or Password Is Empty - Please Try Again");
+  } 
   if (emailLookup(email)) {
     password = bcrypt.hashSync(password, 10);   //hash password
     users[id] = { id, email, password };     //add registered user to database
     req.session.user_id = id;
     return res.redirect(`/urls`);
-  } if (!email || !password) {   //if either are not there, display error
-    return res.send("400: Email or Password Is Empty - Please Try Again");
   } else {
-    return res.send("400: Email Already Exist");
+    return res.status(400).send("400: Email Already Exist");
   }
 });
 
@@ -171,9 +197,9 @@ app.post("/login", (req, res) => {
   const id = passLookup(password, email);//ensure password and email match
   if (id) {
     req.session.user_id = id;       //assign cookie
-    res.redirect(`/urls`);
+    return res.redirect(`/urls`);
   }
-  return res.send("403: ERROR");
+  return res.status(400).send("403: Password or Email is incorrect, please try again");
 });
 
 

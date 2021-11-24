@@ -13,12 +13,7 @@
   <body>
 
     <%- include('partials/_header', {user_id}) %>
-    <% if(!user_id) {  %>
-   
-      <h3>ERROR PLEASE LOGIN</h3>
-      
-      <% } else {  %>
-        
+    
         <main style="margin: 1em;">
           <h3>Create TinyURL</h3>
           <form class="form-inline" action="/urls" method="POST">
@@ -32,7 +27,7 @@
         
 
 
-        <% } %>
+      
       
     </main>
       <!-- Bootstrap JS -->
